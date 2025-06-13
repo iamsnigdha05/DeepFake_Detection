@@ -1,0 +1,3 @@
+# Initialize models
+feature_extractor = ResNeXtFeatureExtractor().to(DEVICE)
+detector = DeepfakeDetector().to(DEVICE)
