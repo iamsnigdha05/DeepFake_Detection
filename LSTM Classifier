@@ -1,0 +1,14 @@
+# Define LSTM Classifier
+class DeepfakeDetector(nn.Module):
+    def __init__(self, feature_dim=2048, hidden_dim=256):
+        super().__init__()
+        self.lstm = nn.LSTM(feature_dim, hidden_dim, batch_first=True)
+        self.fc = nn.Linear(hidden_dim, 1)
+
+        self.sigmoid = nn.Sigmoid()
+
+
+    def forward(self, x):
+        _, (hn, _) = self.lstm(x)
+        out = self.fc(hn[-1])
+        return self.sigmoid(out)
