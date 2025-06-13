@@ -1,0 +1,15 @@
+# === Model ===
+class ResNeXtFeatureExtractor(nn.Module):
+    def __init__(self):
+        super().__init__()
+        resnext = models.resnext50_32x4d(pretrained=True)
+        self.feature_extractor = nn.Sequential(*list(resnext.children())[:-2])
+        self.pool = nn.AdaptiveAvgPool2d((1, 1))  # Add this
+
+    def forward(self, x):
+        with torch.no_grad():
+            x = self.feature_extractor(x)  # [B, 2048, H, W]
+            x = self.pool(x)              # [B, 2048, 1, 1]
+            x = torch.flatten(x, start_dim=1)  # [B, 2048]
+        return x # raw logits (no sigmoid!)
+
