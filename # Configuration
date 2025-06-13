@@ -1,0 +1,6 @@
+# Configuration
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+SEQ_LEN = 5  # number of frames per video
+BATCH_SIZE = 2
+EPOCHS = 100
+LEARNING_RATE = 1e-4
