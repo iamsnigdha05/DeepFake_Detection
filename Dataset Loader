@@ -1,0 +1,50 @@
+ # Custom Dataset Loader
+class DeepfakeVideoDataset(Dataset):
+    def __init__(self, video_dirs, labels, transform=None):
+        self.video_dirs = video_dirs
+        self.labels = labels
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.video_dirs)
+
+    def __getitem__(self, idx):
+        frame_paths = sorted(glob.glob(os.path.join(self.video_dirs[idx], '*.jpg')))[:SEQ_LEN]
+        frames = []
+        for path in frame_paths:
+            image = Image.open(path).convert('RGB')
+            if self.transform:
+                image = self.transform(image)
+            frames.append(image)
+        frames += [frames[-1]] * (SEQ_LEN - len(frames))  # Padding if less than SEQ_LEN
+        frames_tensor = torch.stack(frames)
+        label = torch.tensor(self.labels[idx], dtype=torch.float)
+        return frames_tensor, label
+
+
+def __getitem__(self, idx):
+    frame_paths = sorted(glob.glob(os.path.join(self.video_dirs[idx], '*.jpg')))[:SEQ_LEN]
+
+    if len(frame_paths) == 0:
+        print(f"⚠️ Warning: No frames found in {self.video_dirs[idx]}")
+
+    frames = []
+    for path in frame_paths:
+        try:
+            image = Image.open(path).convert('RGB')
+            if self.transform:
+                image = self.transform(image)
+            frames.append(image)
+        except Exception as e:
+            print(f"Failed to read {path}: {e}")
+
+    # Padding if frames < SEQ_LEN
+    if len(frames) == 0:
+        # Handle corrupted sample safely
+        frames = [torch.zeros(3, 224, 224)] * SEQ_LEN
+    elif len(frames) < SEQ_LEN:
+        frames += [frames[-1]] * (SEQ_LEN - len(frames))
+
+    frames_tensor = torch.stack(frames)
+    label = torch.tensor(self.labels[idx], dtype=torch.int)
+    return frames_tensor, label
