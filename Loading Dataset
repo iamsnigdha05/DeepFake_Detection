@@ -1,0 +1,30 @@
+# Load Dataset
+import os
+import shutil
+import glob
+
+def regroup_frames(base_dir):
+    for label in ['real', 'fake']:
+        src_dir = os.path.join(base_dir, label)
+        all_frames = glob.glob(f"{src_dir}/*.jpg")
+        video_ids = set('_'.join(os.path.basename(f).split('_')[:2]) for f in all_frames)
+
+        for vid_id in video_ids:
+            dest_dir = os.path.join(src_dir, vid_id)
+            os.makedirs(dest_dir, exist_ok=True)
+
+            for frame_path in glob.glob(f"{src_dir}/{vid_id}_frame_*.jpg"):
+                shutil.move(frame_path, os.path.join(dest_dir, os.path.basename(frame_path)))
+
+regroup_frames("/content/aligned_faces_10/aligned_faces_10")
+real_dirs = sorted(glob.glob('/content/aligned_faces_10/aligned_faces_10/real/*'))
+fake_dirs = sorted(glob.glob('/content/aligned_faces_10/aligned_faces_10/fake/*'))
+
+print("Real videos:", len(real_dirs))
+print("Fake videos:", len(fake_dirs))
+
+video_dirs = real_dirs + fake_dirs
+labels = [0] * len(real_dirs) + [1] * len(fake_dirs)
+
+print("Total videos:", len(video_dirs))
+print("Total labels:", len(labels))
