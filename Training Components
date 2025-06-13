@@ -1,0 +1,3 @@
+# Training Components
+criterion = nn.BCEWithLogitsLoss()
+optimizer = torch.optim.Adam(detector.parameters(), lr=LEARNING_RATE)
