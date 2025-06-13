@@ -1,0 +1,24 @@
+# split Dataset
+from sklearn.model_selection import train_test_split
+
+# Step 1: Combine dirs and labels
+video_dirs = real_dirs + fake_dirs
+labels = [0] * len(real_dirs) + [1] * len(fake_dirs)
+
+# Step 2: First split into train+val and test
+trainval_dirs, test_dirs, trainval_labels, test_labels = train_test_split(
+    video_dirs, labels, test_size=0.15, stratify=labels, random_state=42
+)
+
+# Step 3: Split train+val into train and val
+train_dirs, val_dirs, train_labels, val_labels = train_test_split(
+    trainval_dirs, trainval_labels, test_size=0.15/0.85, stratify=trainval_labels, random_state=42
+)
+
+train_dataset = DeepfakeVideoDataset(train_dirs, train_labels, transform)
+val_dataset = DeepfakeVideoDataset(val_dirs, val_labels, transform)
+test_dataset = DeepfakeVideoDataset(test_dirs, test_labels, transform)
+
+train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
+val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False)
+test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False)
