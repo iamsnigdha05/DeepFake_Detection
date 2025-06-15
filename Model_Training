@@ -1,0 +1,38 @@
+# Training Loop with accuracy and loss tracking
+from tqdm import tqdm
+
+train_losses, train_accuracies = [], []
+
+for epoch in range(EPOCHS):
+    detector.train()
+    epoch_loss = 0
+    correct, total = 0, 0
+
+    #Make sure this is indented only once under the `for epoch` loop
+    progress_bar = tqdm(train_loader, desc=f"Epoch {epoch+1}/{EPOCHS}", unit="batch")
+
+    for videos, labels in progress_bar:
+        videos, labels = videos.to(DEVICE), labels.to(DEVICE)
+        b, t, c, h, w = videos.shape
+        videos = videos.view(-1, c, h, w)
+        features = feature_extractor(videos).view(b, t, -1)
+        outputs = detector(features).view(-1)
+
+        loss = criterion(outputs, labels)
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+        epoch_loss += loss.item() * b
+        preds = (outputs > 0.5).int()
+        correct += (preds == labels.int()).sum().item()
+        total += b
+
+        # Update the tqdm bar
+        progress_bar.set_postfix(loss=loss.item(), acc=correct / total)
+
+    avg_loss = epoch_loss / total
+    accuracy = correct / total
+    train_losses.append(avg_loss)
+    train_accuracies.append(accuracy)
+    print(f"Epoch {epoch+1}/{EPOCHS}, Loss: {avg_loss:.4f}, Accuracy: {accuracy:.4f}")
