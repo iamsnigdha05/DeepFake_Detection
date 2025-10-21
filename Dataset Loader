@@ -26,7 +26,7 @@ def __getitem__(self, idx):
     frame_paths = sorted(glob.glob(os.path.join(self.video_dirs[idx], '*.jpg')))[:SEQ_LEN]
 
     if len(frame_paths) == 0:
-        print(f"⚠️ Warning: No frames found in {self.video_dirs[idx]}")
+        print(f"  Warning: No frames found in {self.video_dirs[idx]}")
 
     frames = []
     for path in frame_paths:
